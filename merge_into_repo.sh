@@ -13,6 +13,5 @@ echo "Merging $package_name into $out_dir"
 cp ${raw_dir}/meshes ${out_dir}/meshes/${package_name}/collision
 cp ${raw_dir}/meshes ${out_dir}/meshes/${package_name}/visual
 
-
-
-# cp ${raw_dir}/urdf/*.urdf ${out_dir}/urdf/robots/
+# move all the xacro files into the target urdf directory
+cp ${raw_dir}/urdf/*.xacro ${out_dir}/urdf/robots/

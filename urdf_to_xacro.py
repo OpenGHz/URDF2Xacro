@@ -112,7 +112,7 @@ if __name__ == "__main__":
     urdfer.to_macro(prefix)
     urdfer.add_prefix_var(prefix)
     # save modified URDF file
-    output_path = input_path.replace(".urdf", ".urdf.xacro") if output_path is None else output_path
+    output_path = input_path.replace(".urdf", ".xacro") if output_path is None else output_path
     urdfer.save(output_path)
 
     # format the output file

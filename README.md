@@ -49,7 +49,7 @@ The conversion process includes:
 - Adding XACRO variables within the robot tag.
 - Encapsulating the robot tag's content in a `xacro:macro` tag with a prefix parameter.
 - Renaming all joints and links to incorporate the prefix, e.g., `${prefix}_joint1`.
-- Saving the modified file as a `.urdf.xacro` file with the same name.
+- Saving the modified file as a `.xacro` file with the same name.
 - Formatting the XACRO file using `xmllint` for readability.
 
 ## Custom Usage

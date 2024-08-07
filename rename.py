@@ -4,8 +4,8 @@ import argparse
 
 """
 examples:
-python3 replace_name.py . 'in_name' 'out_name'
-python3 replace_name.py . 'package://package_name' 'package://new_name'
+python3 replace_name.py -in 'in_name' -out 'out_name'
+python3 replace_name.py -in 'package://package_name' -out 'package://new_name'
 """
 
 
