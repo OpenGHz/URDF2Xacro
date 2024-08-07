@@ -1,19 +1,19 @@
-# URDF to XACRO Converter
+# URDF to Xacro Converter
 
-**Tools for modifying URDF packages and converting `URDF` into well organized `XACRO`.**
+**Tools for modifying URDF packages and converting `URDF` into well organized `Xacro`.**
 
 ## Overview
 
-This set of tools helps you modify your URDF ROS package and streamlines the process of converting URDF files into XACRO format, making your robot modeling workflow more efficient.
+This set of tools helps you modify your URDF ROS package and streamlines the process of converting URDF files into Xacro format, making your robot modeling workflow more efficient.
 
 ## Features
 
 - **Package Renaming**: Rename all folders, files and contents in your URDF ROS package.
-- **URDF to XACRO Conversion**: Convert `.urdf` files to `.xacro` format with ease.
+- **URDF to Xacro Conversion**: Convert `.urdf` files to `.xacro` format with ease.
 
 ## Getting Started
 
-Follow these simple steps to start using the URDF to XACRO tools.
+Follow these simple steps to start using the URDF to Xacro tools.
 
 ### 1. Renaming Your Package
 
@@ -32,9 +32,9 @@ If your URDF package path is `~/ws/src/bad--name`, run:
 python3 rename.py -rd ~/ws/src -in BAD--name -out new_name
 ```
 
-### 2. Converting URDF to XACRO
+### 2. Converting URDF to Xacro
 
-To convert your URDF file to XACRO, follow these steps:
+To convert your URDF file to Xacro, follow these steps:
 
 - **Modify the `config.py` file** to set the desired joint limits and other configurations.
 - Run the conversion script with the path to your URDF file:
@@ -46,11 +46,11 @@ python3 urdf_to_xacro.py -in <urdf_file_path>
 The conversion process includes:
 
 - Replacing joint limits with values from `config.py`.
-- Adding XACRO variables within the robot tag.
+- Adding Xacro variables within the robot tag.
 - Encapsulating the robot tag's content in a `xacro:macro` tag with a prefix parameter.
 - Renaming all joints and links to incorporate the prefix, e.g., `${prefix}_joint1`.
 - Saving the modified file as a `.xacro` file with the same name.
-- Formatting the XACRO file using `xmllint` for readability.
+- Formatting the Xacro file using `xmllint` for readability.
 
 ## Custom Usage
 
