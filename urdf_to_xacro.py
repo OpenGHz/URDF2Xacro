@@ -68,9 +68,13 @@ class URDFer(object):
 
     def add_prefix_var(self, name):
         for joint in self.handle.findall("joint"):
-            joint.set("name", f"${{{name}}}_{joint.get('name')}")
+            parent = joint.find("parent")
+            parent.set("link", f"${{{name}}}{parent.get('link')}")
+            child = joint.find("child")
+            child.set("link", f"${{{name}}}{child.get('link')}")
+            joint.set("name", f"${{{name}}}{joint.get('name')}")
         for link in self.handle.findall("link"):
-            link.set("name", f"${{{name}}}_{link.get('name')}")
+            link.set("name", f"${{{name}}}{link.get('name')}")
 
     def save(self, path=None):
         path = path if path is not None else self.file_path
