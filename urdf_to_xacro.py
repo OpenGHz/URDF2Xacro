@@ -140,6 +140,7 @@ if __name__ == "__main__":
         type=str,
         nargs="*",
         help="List of components to modify",
+        default=[],
         choices=modify_choices,
     )
     args = parser.parse_args()
