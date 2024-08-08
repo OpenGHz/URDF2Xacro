@@ -1,5 +1,4 @@
 import xml.etree.ElementTree as ET
-import argparse
 
 
 class URDFer(object):
@@ -82,6 +81,7 @@ class URDFer(object):
 
 
 if __name__ == "__main__":
+    import argparse
 
     parser = argparse.ArgumentParser(description="Replace joint limits in URDF file")
     parser.add_argument(
@@ -102,9 +102,9 @@ if __name__ == "__main__":
         default="prefix",
     )
     args = parser.parse_args()
-    input_path:str = args.input_urdf_path
-    output_path:str = args.output_urdf_path
-    prefix:str = args.prefix
+    input_path: str = args.input_urdf_path
+    output_path: str = args.output_urdf_path
+    prefix: str = args.prefix
 
     # configure joint limits
     from urdf_config import CONFIG
@@ -116,10 +116,13 @@ if __name__ == "__main__":
     urdfer.to_macro(prefix)
     urdfer.add_prefix_var(prefix)
     # save modified URDF file
-    output_path = input_path.replace(".urdf", ".xacro") if output_path is None else output_path
+    output_path = (
+        input_path.replace(".urdf", ".xacro") if output_path is None else output_path
+    )
     urdfer.save(output_path)
+    print(f"Output file saved to {output_path}")
 
-    # format the output file
+    print("Formatting the output file...")
     import subprocess
 
     result = subprocess.run(
@@ -129,3 +132,4 @@ if __name__ == "__main__":
         stderr=subprocess.PIPE,
         text=True,
     )
+    print("Done!")
