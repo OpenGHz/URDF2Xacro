@@ -8,7 +8,8 @@ This set of tools helps you modify your URDF ROS package and streamlines the pro
 
 ## Features
 
-- **Package Renaming**: Rename all folders, files and contents in your URDF ROS package.
+- **Package Renaming**: Replacing matching parts in all folders, files and contents in your URDF ROS package.
+- **URDF Modifying**: Modify URDF files with python scripts instead of manually.
 - **URDF to Xacro Conversion**: Convert `.urdf` files to `.xacro` format with ease.
 
 ## Getting Started
