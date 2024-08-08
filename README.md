@@ -38,7 +38,10 @@ python3 rename.py -path ~/ws/src/BAD--name -in BAD--name -out new_name
 ### 2. Prepare configuration files
 
 - **Create a configuration folder** that contains a python file(e.g. `urdf_config.py`) and ohtter config files.
-- **Convert links_intertial.txt** that contains intertial information copied from solidworks to a json file.
+- **Convert links_intertial.txt** that contains intertial information copied from solidworks to a json file:
+  ```bash
+  python3 extract_intertial.py -in example_config/links_inertial.txt -t 1e-5 -ln base_link link1
+  ```
 - **Modify the python file** to set the desired configurations, e.g. `joints_limit`, `links_intertial`, etc.
 
 ### 3. Converting URDF to Xacro

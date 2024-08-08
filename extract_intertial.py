@@ -18,7 +18,8 @@ parser.add_argument(
     default=default_thresh,
 )
 parser.add_argument(
-    "links_name",
+    "-ln",
+    "--links_name",
     type=str,
     nargs="*",
     help="Name of the links in the URDF file",
