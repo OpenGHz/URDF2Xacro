@@ -71,7 +71,6 @@ if os.path.exists(output_path):
         old_data: dict = json.load(file)
     old_data.update(link_inertial)
     link_inertial = old_data
-    print(link_inertial)
 else:
     print("No links_inertial.json file found")
 
