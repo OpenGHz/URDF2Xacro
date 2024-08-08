@@ -21,16 +21,16 @@ Follow these simple steps to start using the URDF to Xacro tools.
 ROS packages have specific naming conventions. Use the following command to rename your package:
 
 ```bash
-python3 rename.py -rd <directory/of/your/package> -in <old_name> -out <new_name>
+python3 rename.py -path <path/of/your/package> -in <old_name> -out <new_name>
 ```
 
 This command will replace the old package name in all folders, files, and file contents with the new name.
 
 **Example:**
-If your URDF package path is `~/ws/src/bad--name`, run:
+If your URDF package path is `~/ws/src/BAD--name`, run:
 
 ```bash
-python3 rename.py -rd ~/ws/src -in BAD--name -out new_name
+python3 rename.py -path ~/ws/src/BAD--name -in BAD--name -out new_name
 ```
 
 ### 2. Converting URDF to Xacro

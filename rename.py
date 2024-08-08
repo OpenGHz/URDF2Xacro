@@ -5,7 +5,7 @@ import argparse
 """
 examples:
 python3 replace_name.py -in 'in_name' -out 'out_name'
-python3 replace_name.py -in 'package://package_name' -out 'package://new_name'
+python3 replace_name.py -in 'path://path_name' -out 'path://new_name'
 """
 
 
@@ -44,14 +44,26 @@ def rename_items(root_dir, pattern, replacement):
                 os.rename(old_dir_path, new_dir_path)
 
 
+def rename_path(path, pattern, replacement):
+    dir = os.path.dirname(path)
+    old_name = os.path.basename(path)
+    new_name = re.sub(pattern, replacement, old_name)
+    new_path = os.path.join(dir, new_name)
+
+    if new_path != path:
+        os.rename(path, new_path)
+
+    return new_path
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Replace a pattern in the names of files and directories and in the content of files."
     )
     parser.add_argument(
-        "-rd",
-        "--root_directory",
+        "-path",
+        "--package_path",
         help="The root directory where the search will start.",
         default=".",
     )
@@ -61,8 +73,10 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    root_directory = os.path.expanduser(args.root_directory)
+    path = os.path.expanduser(args.package_path)
     search_pattern = args.search_pattern
     replacement_string = args.replacement_string
+    rename_path(path, search_pattern, replacement_string)
+    rename_items(path, search_pattern, replacement_string)
 
-    rename_items(root_directory, search_pattern, replacement_string)
+    print("Done!")
