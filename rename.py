@@ -9,18 +9,31 @@ python3 replace_name.py -path package_path -in 'path://path_name' -out 'path://n
 """
 
 
+def is_binary_file(file_path):
+    try:
+        with open(file_path, "rb") as file:
+            chunk = file.read(1024)
+            if b"\0" in chunk:  # 检查是否有空字节
+                return True
+        return False
+    except Exception as e:
+        print(f"Error reading file {file_path}: {e}")
+        return False
+
+
 def replace_in_file(file_path, pattern, replacement):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
     except UnicodeDecodeError:
-        with open(file_path, "r", encoding="latin1") as file:
-            content = file.read()
+        print(f"Ignore modifying contents in {file_path}")
+        # with open(file_path, "r", encoding="latin1") as file:
+        #     content = file.read()
+    else:
+        new_content = re.sub(pattern, replacement, content)
 
-    new_content = re.sub(pattern, replacement, content)
-
-    with open(file_path, "w", encoding="utf-8") as file:
-        file.write(new_content)
+        with open(file_path, "w", encoding="utf-8") as file:
+            file.write(new_content)
 
 
 def rename_items(root_dir, pattern, replacement):
@@ -30,7 +43,11 @@ def rename_items(root_dir, pattern, replacement):
             new_file_name = re.sub(pattern, replacement, name)
             new_file_path = os.path.join(root, new_file_name)
 
-            replace_in_file(old_file_path, pattern, replacement)
+            # Replace the pattern in the content of the file
+            if ".STL" not in name:  # skip STL files
+                replace_in_file(old_file_path, pattern, replacement)
+            else:
+                print(f"Ignore modifying contents in {old_file_path}")
 
             if new_file_path != old_file_path:
                 os.rename(old_file_path, new_file_path)
@@ -65,10 +82,16 @@ if __name__ == "__main__":
         "-path",
         "--package_path",
         help="The path of your URDF package.",
+        required=True,
     )
-    parser.add_argument("-in", "--search_pattern", help="The pattern to search for.")
     parser.add_argument(
-        "-out", "--replacement_string", help="The string to replace the pattern with."
+        "-in", "--search_pattern", help="The pattern to search for.", required=True
+    )
+    parser.add_argument(
+        "-out",
+        "--replacement_string",
+        help="The string to replace the pattern with.",
+        required=True,
     )
     args = parser.parse_args()
 
