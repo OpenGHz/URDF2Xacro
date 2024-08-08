@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # input obsolute paths to the raw directory and the output directory
 raw_path=$1
 out_path=$2
