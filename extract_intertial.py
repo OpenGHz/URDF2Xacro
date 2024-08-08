@@ -1,6 +1,6 @@
 import re
 import argparse
-from typing import List
+from typing import List, Optional
 import json
 import os
 
@@ -28,12 +28,11 @@ args = parser.parse_args()
 input_path: str = args.input_text_path
 output_path: str = args.output_json_path
 threshold: float = args.threshold
-links_name: List[str] = args.links_name
+links_name: Optional[List[str]] = args.links_name
 assert input_path.endswith(".txt"), "Input file must be a .txt file"
 output_path = (
     input_path.replace(".txt", ".json") if output_path is None else output_path
 )
-
 # 读取.txt文件
 with open(input_path, "r", encoding="utf-8") as file:
     document = file.read()
@@ -44,7 +43,7 @@ tensor_pattern = re.compile(
 )
 
 # 解析文件
-if len(links_name) == 0:
+if links_name is None:
     link_pattern = re.compile(r"(link\d*|\w+_link\d*)")
     links_name = link_pattern.findall(document)
     assert (
