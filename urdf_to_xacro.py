@@ -138,10 +138,9 @@ if __name__ == "__main__":
         "-ml",
         "--modify_list",
         type=str,
-        nargs="+",
+        nargs="*",
         help="List of components to modify",
         choices=modify_choices,
-        default=[],
     )
     args = parser.parse_args()
     input_path: str = args.input_urdf_path
