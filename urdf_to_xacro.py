@@ -1,5 +1,9 @@
 import xml.etree.ElementTree as ET
 from typing import Dict
+import subprocess, os, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from rename import replace_in_file
 
 
 class URDFer(object):
@@ -8,18 +12,21 @@ class URDFer(object):
         self.tree = ET.parse(file_path)
         self.root = self.tree.getroot()
         self.robot_name = self.root.get("name")
-        index = self.is_macro()
-        self._is_macro = index is not None
-        self.handle = (
-            self.root if not self._is_macro else self.root.findall("xacro:macro")[index]
-        )
+        macro = self.is_macro()
+        self._is_macro = macro is not None
+        self._to_xacro = False
+        self.handle = self.root if not self._is_macro else macro
         print(f"Robot name: {self.robot_name}")
         assert self.robot_name is not None, "Robot name not found"
 
     def is_macro(self):
-        for index, macro in enumerate(self.root.findall("xacro:macro")):
-            if macro.get("name") == self.robot_name:
-                return index
+        for item in list(self.root):
+            # useless methods
+            # ET.register_namespace('xacro', 'http://wiki.ros.org/xacro')
+            # print(item.tag)
+            # print(self.root.get('{http://wiki.ros.org/xacro}macro'))
+            if "macro" in item.tag and item.get("name") == self.robot_name:
+                return item
         return None
 
     def replace_joint_limits(self, joint_limits):
@@ -84,6 +91,7 @@ class URDFer(object):
         self.root.append(xacro_macro)
         # 修改全局变量
         self._is_macro = True
+        self._to_xacro = True
         self.handle = xacro_macro
         self.add_prefix_var(prefix)
 
@@ -97,9 +105,54 @@ class URDFer(object):
         for link in self.handle.findall("link"):
             link.set("name", f"${{{name}}}{link.get('name')}")
 
+    def split_mesh_paths(
+        self,
+        old_visual_path,
+        new_visual_path,
+        old_collision_path,
+        new_collision_path,
+    ):
+        for link in self.handle.findall("link"):
+            visual = link.find("visual")
+            if visual is not None:
+                geo = visual.find("geometry")
+                mesh_handle = geo.find("mesh")
+                new_name = mesh_handle.get("filename").replace(
+                    old_visual_path, new_visual_path
+                )
+                mesh_handle.set("filename", new_name)
+            else:
+                print(f"There is no visual tag in {link.get('name')}")
+            collision = link.find("collision")
+            if collision is not None:
+                geo = collision.find("geometry")
+                mesh_handle = geo.find("mesh")
+                new_name = mesh_handle.get("filename").replace(
+                    old_collision_path, new_collision_path
+                )
+                mesh_handle.set("filename", new_name)
+            else:
+                print(f"There is no collision tag in {link.get('name')}")
+
+    def format(self):
+        result = subprocess.run(
+            ["xmllint", "--format", output_path, "-o", output_path],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        return result
+
     def save(self, path=None):
         path = path if path is not None else self.file_path
-        self.tree.write(path, encoding="utf-8", xml_declaration=True)
+        self.tree.write(path, encoding="utf-8", xml_declaration=True, method="xml")
+        if not self._to_xacro and self._is_macro:
+            self.restore_xacro(path)
+
+    def restore_xacro(self, path):
+        replace_in_file(path, ":ns0", ":xacro")
+        replace_in_file(path, "ns0:", "xacro:")
 
 
 if __name__ == "__main__":
@@ -178,13 +231,5 @@ if __name__ == "__main__":
     print(f"Output file saved to {output_path}")
 
     print("Formatting the output file...")
-    import subprocess
-
-    result = subprocess.run(
-        ["xmllint", "--format", output_path, "-o", output_path],
-        check=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-    )
+    urdfer.format()
     print("Done!")
