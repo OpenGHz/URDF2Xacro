@@ -134,7 +134,8 @@ class URDFer(object):
             else:
                 print(f"There is no collision tag in {link.get('name')}")
 
-    def format(self):
+    @staticmethod
+    def format(output_path):
         result = subprocess.run(
             ["xmllint", "--format", output_path, "-o", output_path],
             check=True,
@@ -231,5 +232,5 @@ if __name__ == "__main__":
     print(f"Output file saved to {output_path}")
 
     print("Formatting the output file...")
-    urdfer.format()
+    urdfer.format(output_path)
     print("Done!")

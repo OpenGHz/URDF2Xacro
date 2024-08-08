@@ -45,7 +45,7 @@ urdfer = URDFer(input_urdf_path)
 urdfer.split_mesh_paths(
     old_visual_path, new_visual_path, old_collision_path, new_collision_path
 )
-urdfer.save()
-urdfer.format()
+urdfer.save(output_urdf_path)
+urdfer.format(output_urdf_path)
 
 print("Done!")
