@@ -80,3 +80,19 @@ else:
 # 保存惯量数据
 with open(output_path, "w", encoding="utf-8") as file:
     json.dump(link_inertial, file, indent=4)
+
+print(f"Saved inertial data to {output_path}")
+print("Done!")
+
+# 代码中的正则表达式用于匹配具有以下格式的文本行：
+#
+# Lxx = 0.000000 Lxy = 0.000000 Lxz = 0.000000
+# Lyx = 0.000000 Lyy = 0.000000 Lyz = 0.000000
+# Lzx = 0.000000 Lzy = 0.000000 Lzz = 0.000000
+#
+# 该正则表达式将匹配这样的行，并将每个值提取为一个组。这些组将在后续代码中用于提取数据。
+#
+# 代码中的链接名称是通过正则表达式匹配的。如果未提供链接名称，则使用以下正则表达式：
+#
+# link_pattern = re.compile(r"(link\d*|\w+_link\d*)")
+# links_name = link_pattern.findall(document)
