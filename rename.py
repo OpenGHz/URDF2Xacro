@@ -100,8 +100,6 @@ if __name__ == "__main__":
     path = os.path.expanduser(args.package_path)
     search_pattern = args.search_pattern
     replacement_string = args.replacement_string
-    # print(f"Rename package folder")
-    rename_path(path, search_pattern, replacement_string)
     rename_items(path, search_pattern, replacement_string)
-
+    rename_path(path, search_pattern, replacement_string)
     print("Done!")
