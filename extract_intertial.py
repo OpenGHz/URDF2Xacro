@@ -46,6 +46,9 @@ tensor_pattern = re.compile(
 if len(links_name) == 0:
     link_pattern = re.compile(r"(link\d*|\w+_link\d*)")
     links_name = link_pattern.findall(document)
+    assert (
+        len(links_name) > 0
+    ), "No supported link names found in the document, please modify or provide them through the command line"
     print(f"Found links: {links_name}")
 tensors = tensor_pattern.findall(document)
 assert len(tensors) == len(links_name), "Number of link names and tensors do not match"
