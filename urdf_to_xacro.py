@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from typing import Dict
 
 
 class URDFer(object):
@@ -37,11 +38,31 @@ class URDFer(object):
                     if "velocity" in new_limits:
                         limit_element.set("velocity", str(new_limits["velocity"]))
 
+    def replace_link_inertial(self, link_inertial: Dict[str, dict]):
+        if self._is_macro:
+            for key, value in link_inertial.items():
+                link_inertial[f"${{prefix}}{key}"] = value
+                del link_inertial[key]
+        for link in self.handle.findall("link"):
+            link_name = link.get("name")
+            if link_name in link_inertial:
+                inertial_element = link.find("inertial")
+                if inertial_element is not None:
+                    for key, value in link_inertial[link_name].items():
+                        handle = inertial_element.find(key)
+                        if isinstance(value, dict):
+                            for k, v in value.items():
+                                handle.set(k, str(v))
+                        else:
+                            handle.set("value", str(value))
+            else:
+                print(f"Link {link_name} not found in link_inertial config")
+
     def add_robot_attributes(self, attributes: dict):
         for attr, value in attributes.items():
             self.root.set(attr, value)
 
-    def to_macro(self, params):
+    def to_xacro_style(self, params):
         if self._is_macro:
             print("Already a macro")
             return
@@ -64,6 +85,7 @@ class URDFer(object):
         # 修改全局变量
         self._is_macro = True
         self.handle = xacro_macro
+        self.add_prefix_var(prefix)
 
     def add_prefix_var(self, name):
         for joint in self.handle.findall("joint"):
@@ -82,7 +104,11 @@ class URDFer(object):
 
 if __name__ == "__main__":
     import argparse
+    from importlib import import_module
+    import os, sys
 
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    modify_choices = ["joints_limit", "links_inertial", "all"]
     parser = argparse.ArgumentParser(description="Replace joint limits in URDF file")
     parser.add_argument(
         "-in", "--input_urdf_path", type=str, help="Path to the URDF file"
@@ -95,30 +121,59 @@ if __name__ == "__main__":
         default=None,
     )
     parser.add_argument(
+        "-cfg",
+        "--config_file_path",
+        type=str,
+        help="Path to the configuration .py file",
+        default=f"{current_dir}/example_config/urdf_config.py",
+    )
+    parser.add_argument(
         "-p",
         "--prefix",
         type=str,
         help="The prefix to add to the joint and link names",
         default="prefix",
     )
+    parser.add_argument(
+        "-ml",
+        "--modify_list",
+        type=str,
+        nargs="+",
+        help="List of components to modify",
+        choices=modify_choices,
+        default=[],
+    )
     args = parser.parse_args()
     input_path: str = args.input_urdf_path
     output_path: str = args.output_urdf_path
+    config_path: str = args.config_file_path
+    modify_list: list = args.modify_list
     prefix: str = args.prefix
 
-    # configure joint limits
-    from urdf_config import CONFIG
-
-    joint_limits = CONFIG["joint_limits"]
-    # modify URDF file
-    urdfer = URDFer(input_path)
-    urdfer.replace_joint_limits(joint_limits)
-    urdfer.to_macro(prefix)
-    urdfer.add_prefix_var(prefix)
-    # save modified URDF file
     output_path = (
         input_path.replace(".urdf", ".xacro") if output_path is None else output_path
     )
+
+    # import configuration file and get CONFIG dict
+    sys.path.insert(0, os.path.dirname(config_path))
+    module_name = os.path.basename(config_path).replace(".py", "")
+    print(f"Importing configuration file from {config_path}")
+    config = import_module(module_name)
+    CONFIG = config.CONFIG
+
+    # initialize URDFer
+    urdfer = URDFer(input_path)
+    # modify URDF file
+    modify_list = modify_choices[:-1] if "all" in modify_list else modify_list
+    process_dict = {
+        "joints_limit": urdfer.replace_joint_limits,
+        "links_inertial": urdfer.replace_link_inertial,
+    }
+    for key in modify_list:
+        process_dict[key](CONFIG[key])
+    # change the URDF file to xacro style
+    urdfer.to_xacro_style(prefix)
+    # save modified URDF file
     urdfer.save(output_path)
     print(f"Output file saved to {output_path}")
 

@@ -9,8 +9,10 @@ This set of tools helps you modify your URDF ROS package and streamlines the pro
 ## Features
 
 - **Package Renaming**: Replacing matching parts in all folders, files and contents in your URDF ROS package.
-- **URDF Modifying**: Modify URDF files with python scripts instead of manually.
-- **URDF to Xacro Conversion**: Convert `.urdf` files to `.xacro` format with ease.
+- **URDF Modifying**: Modify URDF files with python scripts instead of manually. What you need is to create a basic URDF file first and then automatically modifying it as you wish.
+  - Extract intertial from a text file copied from solidworks and save to a json file.
+  - Use a python file to flexibly load all configs to a CONFIG dict, which will be used by the convertion tool.
+- **URDF to Xacro Conversion**: Convert `.urdf` files to a well organized `.xacro` format with ease.
 
 ## Getting Started
 
@@ -33,25 +35,28 @@ If your URDF package path is `~/ws/src/BAD--name`, run:
 python3 rename.py -path ~/ws/src/BAD--name -in BAD--name -out new_name
 ```
 
-### 2. Converting URDF to Xacro
+### 2. Prepare configuration files
 
-To convert your URDF file to Xacro, follow these steps:
+- **Create a configuration folder** that contains a python file(e.g. `urdf_config.py`) and ohtter config files.
+- **Convert links_intertial.txt** that contains intertial information copied from solidworks to a json file.
+- **Modify the python file** to set the desired configurations, e.g. `joints_limit`, `links_intertial`, etc.
 
-- **Modify the `config.py` file** to set the desired joint limits and other configurations.
+### 3. Converting URDF to Xacro
+
 - Run the conversion script with the path to your URDF file:
 
 ```bash
-python3 urdf_to_xacro.py -in <urdf_file_path>
+python3 urdf_to_xacro.py -in <urdf_file_path> -cfg example_config/urdf_config.py -ml all
 ```
 
 The conversion process includes:
 
-- Replacing joint limits with values from `config.py`.
+- Replacing joints limit and links_intertial with values from `CONFIG` dict in `config.py`.
 - Adding Xacro variables within the robot tag.
 - Encapsulating the robot tag's content in a `xacro:macro` tag with a prefix parameter.
-- Renaming all joints and links to incorporate the prefix, e.g., `${prefix}_joint1`.
+- Renaming all joints and links to incorporate the prefix, e.g., `${prefix}joint1`.
 - Saving the modified file as a `.xacro` file with the same name.
-- Formatting the Xacro file using `xmllint` for readability.
+- Formatting the Xacro file using `xmllint` for uniformity and readability.
 
 ## Custom Usage
 
