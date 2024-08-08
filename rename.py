@@ -27,8 +27,6 @@ def replace_in_file(file_path, pattern, replacement):
             content = file.read()
     except UnicodeDecodeError:
         print(f"Ignore modifying contents in {file_path}")
-        # with open(file_path, "r", encoding="latin1") as file:
-        #     content = file.read()
     else:
         new_content = re.sub(pattern, replacement, content)
 
@@ -38,13 +36,16 @@ def replace_in_file(file_path, pattern, replacement):
 
 def rename_items(root_dir, pattern, replacement):
     for root, dirs, files in os.walk(root_dir, topdown=False):
+        # print(f"Processing {root}")
         for name in files:
+            # print("Processing file: ", name)
             old_file_path = os.path.join(root, name)
             new_file_name = re.sub(pattern, replacement, name)
             new_file_path = os.path.join(root, new_file_name)
 
             # Replace the pattern in the content of the file
             if ".STL" not in name:  # skip STL files
+                # print(f"Modifying contents in {old_file_path}")
                 replace_in_file(old_file_path, pattern, replacement)
             else:
                 print(f"Ignore modifying contents in {old_file_path}")
@@ -53,6 +54,7 @@ def rename_items(root_dir, pattern, replacement):
                 os.rename(old_file_path, new_file_path)
 
         for name in dirs:
+            # print("Processing directory: ", name)
             old_dir_path = os.path.join(root, name)
             new_dir_name = re.sub(pattern, replacement, name)
             new_dir_path = os.path.join(root, new_dir_name)
@@ -98,6 +100,7 @@ if __name__ == "__main__":
     path = os.path.expanduser(args.package_path)
     search_pattern = args.search_pattern
     replacement_string = args.replacement_string
+    # print(f"Rename package folder")
     rename_path(path, search_pattern, replacement_string)
     rename_items(path, search_pattern, replacement_string)
 
