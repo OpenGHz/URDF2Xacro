@@ -64,8 +64,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-path",
         "--package_path",
-        help="The root directory where the search will start.",
-        default=".",
+        help="The path of your URDF package.",
     )
     parser.add_argument("-in", "--search_pattern", help="The pattern to search for.")
     parser.add_argument(
