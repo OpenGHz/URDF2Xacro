@@ -5,6 +5,7 @@ set -e
 # input obsolute paths to the raw directory and the output directory
 raw_path=$1
 out_path=$2
+type=$3
 # get the package name from the raw directory
 package_name=$(basename $raw_path)
 
@@ -21,6 +22,6 @@ cp ${raw_collision_meshes_dir}/* ${target_meshes_dir}/collision
 cp ${raw_collision_meshes_dir}/* ${target_meshes_dir}/visual
 
 # move all the xacro files into the target urdf directory
-cp ${raw_path}/urdf/*.xacro ${out_path}/urdf/robots/
+cp ${raw_path}/urdf/*.xacro ${out_path}/urdf/${type}s/
 
 echo "Merged $package_name into $out_path"
