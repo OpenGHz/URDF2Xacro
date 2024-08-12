@@ -16,9 +16,9 @@ def process_with_meshlab(input_filepath, output_filepath, script):
     print(f"Processed {input_filepath} -> {output_filepath}")
 
 
-def process_directory(in_dir, out_dir, prefix, script):
+def process_directory(in_dir, out_dir, prefix, script, mesh_format):
     for filename in os.listdir(in_dir):
-        if filename.endswith(".stl") or filename.endswith(".STL"):
+        if filename.endswith(f".{mesh_format}"):
             input_filepath = os.path.join(in_dir, filename)
             output_filepath = os.path.join(out_dir, prefix + filename)
             process_with_meshlab(input_filepath, output_filepath, script)
@@ -50,11 +50,20 @@ if __name__ == "__main__":
         help="Path to MeshLab script for simplification",
         default=f"{current_directory}/meshlab.xml",
     )
+    parser.add_argument(
+        "-fmt",
+        "--mesh_format",
+        type=str,
+        help="Format of meshes to process",
+        default="STL",
+        choices=["STL", "stl", "OBJ", "obj"],
+    )
     args = parser.parse_args()
     in_dir = args.input_dir
     out_dir = args.output_dir
     script = args.script_path
     name_prefix = args.name_prefix
+    mesh_format = args.mesh_format
 
     out_dir = out_dir if out_dir is not None else in_dir
-    process_directory(in_dir, out_dir, name_prefix, script)
+    process_directory(in_dir, out_dir, name_prefix, script, mesh_format)
