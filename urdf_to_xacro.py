@@ -14,6 +14,8 @@ class URDFer(object):
         self.robot_name = self.root.get("name")
         macro = self.is_macro()
         self._is_macro = macro is not None
+        is_xacro = file_path.endswith(".xacro")
+        self._is_xacro = is_xacro if not self._is_macro else True
         self._to_xacro = False
         self.handle = self.root if not self._is_macro else macro
         print(f"Robot name: {self.robot_name}")
@@ -92,6 +94,7 @@ class URDFer(object):
         # 修改全局变量
         self._is_macro = True
         self._to_xacro = True
+        self._is_xacro = True
         self.handle = xacro_macro
         self.add_prefix_var(prefix)
 
@@ -148,7 +151,7 @@ class URDFer(object):
     def save(self, path=None):
         path = path if path is not None else self.file_path
         self.tree.write(path, encoding="utf-8", xml_declaration=True, method="xml")
-        if not self._to_xacro and self._is_macro:
+        if not self._to_xacro and self._is_xacro:
             self.restore_xacro(path)
 
     def restore_xacro(self, path):
