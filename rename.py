@@ -44,7 +44,7 @@ def rename_items(root_dir, pattern, replacement):
             new_file_path = os.path.join(root, new_file_name)
 
             # Replace the pattern in the content of the file
-            if ".STL" not in name:  # skip STL files
+            if ".STL" not in name and ".stl" not in name:  # skip STL files
                 # print(f"Modifying contents in {old_file_path}")
                 replace_in_file(old_file_path, pattern, replacement)
             else:
