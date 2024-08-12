@@ -1,3 +1,4 @@
 test.py
 __pycache__/
 *.xacro
+urdf_config_*/

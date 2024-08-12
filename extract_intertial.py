@@ -1,6 +1,6 @@
 import re
 import argparse
-from typing import List, Optional
+from typing import List, Optional, Dict
 import json
 import os
 
@@ -71,8 +71,10 @@ for link, tensor in zip(links_name, tensors):
 if os.path.exists(output_path):
     print("Updating existing data")
     with open(output_path, "r", encoding="utf-8") as file:
-        old_data: dict = json.load(file)
-    old_data.update(link_inertial)
+        old_data: Dict[str, dict] = json.load(file)
+    for link in links_name:
+        old_data[link]["inertia"].update(link_inertial[link]["inertia"])
+        # old_data[link]["mass"] = link_inertial[link]["mass"]
     link_inertial = old_data
 else:
     print("No links_inertial.json file found")
