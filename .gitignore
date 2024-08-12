@@ -2,3 +2,4 @@ test.py
 __pycache__/
 *.xacro
 urdf_config_*/
+!urdf_config_example/
