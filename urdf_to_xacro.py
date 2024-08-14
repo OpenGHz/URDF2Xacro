@@ -133,24 +133,26 @@ class URDFer(object):
         new_collision_path,
     ):
         for link in self.handle.findall("link"):
-            visual = link.find("visual")
-            if visual is not None:
-                geo = visual.find("geometry")
-                mesh_handle = geo.find("mesh")
-                new_name = mesh_handle.get("filename").replace(
-                    old_visual_path, new_visual_path
-                )
-                mesh_handle.set("filename", new_name)
+            visuals = link.findall("visual")
+            if visuals is not None:
+                for visual in visuals:
+                    geo = visual.find("geometry")
+                    mesh_handle = geo.find("mesh")
+                    new_name = mesh_handle.get("filename").replace(
+                        old_visual_path, new_visual_path
+                    )
+                    mesh_handle.set("filename", new_name)
             else:
                 print(f"There is no visual tag in {link.get('name')}")
-            collision = link.find("collision")
-            if collision is not None:
-                geo = collision.find("geometry")
-                mesh_handle = geo.find("mesh")
-                new_name = mesh_handle.get("filename").replace(
-                    old_collision_path, new_collision_path
-                )
-                mesh_handle.set("filename", new_name)
+            collisions = link.findall("collision")
+            if collisions is not None:
+                for collision in collisions:
+                    geo = collision.find("geometry")
+                    mesh_handle = geo.find("mesh")
+                    new_name = mesh_handle.get("filename").replace(
+                        old_collision_path, new_collision_path
+                    )
+                    mesh_handle.set("filename", new_name)
             else:
                 print(f"There is no collision tag in {link.get('name')}")
 
