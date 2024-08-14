@@ -36,16 +36,26 @@ class URDFer(object):
             joint_name = joint.get("name")
             if joint_name in joint_limits:
                 limit_element = joint.find("limit")
-                if limit_element is not None:
-                    new_limits = joint_limits[joint_name]
-                    if "lower" in new_limits:
-                        limit_element.set("lower", str(new_limits["lower"]))
-                    if "upper" in new_limits:
-                        limit_element.set("upper", str(new_limits["upper"]))
-                    if "effort" in new_limits:
-                        limit_element.set("effort", str(new_limits["effort"]))
-                    if "velocity" in new_limits:
-                        limit_element.set("velocity", str(new_limits["velocity"]))
+                new_limits = joint_limits[joint_name]
+                continuous = None in (new_limits["lower"], new_limits["upper"])
+                if continuous:
+                    joint.set("type", "continuous")
+                    continue
+                else:
+                    joint.set("type", "revolute")
+                if limit_element is None:
+                    # create a new limit element
+                    limit_element = ET.Element("limit")
+                    joint.append(limit_element)
+                # update the limit element
+                if "lower" in new_limits:
+                    limit_element.set("lower", str(new_limits["lower"]))
+                if "upper" in new_limits:
+                    limit_element.set("upper", str(new_limits["upper"]))
+                if "effort" in new_limits:
+                    limit_element.set("effort", str(new_limits["effort"]))
+                if "velocity" in new_limits:
+                    limit_element.set("velocity", str(new_limits["velocity"]))
 
     def replace_link_inertial(self, link_inertial: Dict[str, dict]):
         if self._is_macro:
@@ -56,14 +66,21 @@ class URDFer(object):
             link_name = link.get("name")
             if link_name in link_inertial:
                 inertial_element = link.find("inertial")
-                if inertial_element is not None:
-                    for key, value in link_inertial[link_name].items():
-                        handle = inertial_element.find(key)
-                        if isinstance(value, dict):
-                            for k, v in value.items():
-                                handle.set(k, str(v))
-                        else:
-                            handle.set("value", str(value))
+                virtual = link_inertial[link_name] is None
+                if virtual:
+                    continue
+                if inertial_element is None:
+                    # create a new inertial element
+                    inertial_element = ET.Element("inertial")
+                    link.append(inertial_element)
+                # update the inertial element
+                for key, value in link_inertial[link_name].items():
+                    handle = inertial_element.find(key)
+                    if isinstance(value, dict):
+                        for k, v in value.items():
+                            handle.set(k, str(v))
+                    else:
+                        handle.set("value", str(value))
             else:
                 print(f"Link {link_name} not found in link_inertial config")
 
@@ -212,11 +229,12 @@ if __name__ == "__main__":
     )
 
     # import configuration file and get CONFIG dict
+    assert os.path.exists(config_path), f"Configuration file not found at {config_path}"
     sys.path.insert(0, os.path.dirname(config_path))
     module_name = os.path.basename(config_path).replace(".py", "")
     print(f"Importing configuration file from {config_path}")
     config = import_module(module_name)
-    CONFIG = config.CONFIG
+    CONFIG: dict = config.CONFIG
 
     # initialize URDFer
     urdfer = URDFer(input_path)
@@ -227,7 +245,10 @@ if __name__ == "__main__":
         "links_inertial": urdfer.replace_link_inertial,
     }
     for key in modify_list:
-        process_dict[key](CONFIG[key])
+        value = CONFIG.get(key)
+        if value is not None:
+            print(f"Modifying {key}...")
+            process_dict[key](value)
     # change the URDF file to xacro style
     urdfer.to_xacro_style(prefix)
     # save modified URDF file
