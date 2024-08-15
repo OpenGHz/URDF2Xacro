@@ -67,3 +67,5 @@ if __name__ == "__main__":
 
     out_dir = out_dir if out_dir is not None else in_dir
     process_directory(in_dir, out_dir, name_prefix, script, mesh_format)
+
+    print("Done!")
