@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from typing import Dict
 import subprocess, os, sys
+from copy import deepcopy
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from rename import replace_in_file
@@ -131,12 +132,21 @@ class URDFer(object):
         new_visual_path,
         old_collision_path,
         new_collision_path,
+        create_collision,
     ):
         for link in self.handle.findall("link"):
             visuals = link.findall("visual")
-            if visuals is not None:
+            collisions = link.findall("collision")
+
+            if len(visuals) > 0:
                 for visual in visuals:
                     geo = visual.find("geometry")
+                    # create collision tag if it doesn't exist
+                    if len(collisions) == 0 and create_collision:
+                        collision = ET.Element("collision")
+                        collision.append(visual.find("origin"))
+                        collision.append(deepcopy(geo))
+                        link.append(collision)
                     mesh_handle = geo.find("mesh")
                     new_name = mesh_handle.get("filename").replace(
                         old_visual_path, new_visual_path
@@ -144,8 +154,9 @@ class URDFer(object):
                     mesh_handle.set("filename", new_name)
             else:
                 print(f"There is no visual tag in {link.get('name')}")
-            collisions = link.findall("collision")
-            if collisions is not None:
+
+            collisions = link.findall("collision")  # update the collisions list
+            if len(collisions) > 0:
                 for collision in collisions:
                     geo = collision.find("geometry")
                     mesh_handle = geo.find("mesh")

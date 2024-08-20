@@ -23,6 +23,7 @@ parser.add_argument("-nv", "--new_visual_path", type=str, help="New visual mesh 
 parser.add_argument(
     "-nc", "--new_collision_path", type=str, help="New collision mesh path"
 )
+parser.add_argument("-cc", "--create_collision", action="store_true")
 
 args = parser.parse_args()
 
@@ -32,6 +33,7 @@ old_visual_path: str = args.old_visual_path
 old_collision_path: str = args.old_collision_path
 new_visual_path: str = args.new_visual_path
 new_collision_path: str = args.new_collision_path
+create_collision: bool = args.create_collision
 
 output_urdf_path = input_urdf_path if output_urdf_path is None else output_urdf_path
 old_collision_path = (
@@ -43,7 +45,11 @@ new_collision_path = (
 
 urdfer = URDFer(input_urdf_path)
 urdfer.split_mesh_paths(
-    old_visual_path, new_visual_path, old_collision_path, new_collision_path
+    old_visual_path,
+    new_visual_path,
+    old_collision_path,
+    new_collision_path,
+    create_collision,
 )
 urdfer.save(output_urdf_path)
 urdfer.format(output_urdf_path)
