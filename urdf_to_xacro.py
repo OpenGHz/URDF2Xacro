@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from typing import Dict
+from typing import Dict, Optional
 import subprocess, os, sys
 from copy import deepcopy
 
@@ -247,7 +247,7 @@ if __name__ == "__main__":
     module_name = os.path.basename(config_path).replace(".py", "")
     print(f"Importing configuration file from {config_path}")
     config = import_module(module_name)
-    CONFIG: dict = config.CONFIG
+    CONFIG: Optional[dict] = config.CONFIG
 
     # initialize URDFer
     urdfer = URDFer(input_path)
@@ -257,11 +257,12 @@ if __name__ == "__main__":
         "joints_limit": urdfer.replace_joint_limits,
         "links_inertial": urdfer.replace_link_inertial,
     }
-    for key in modify_list:
-        value = CONFIG.get(key)
-        if value is not None:
-            print(f"Modifying {key}...")
-            process_dict[key](value)
+    if CONFIG is not None:
+        for key in modify_list:
+            value = CONFIG.get(key)
+            if value is not None:
+                print(f"Modifying {key}...")
+                process_dict[key](value)
     # change the URDF file to xacro style
     urdfer.to_xacro_style(prefix)
     # save modified URDF file
